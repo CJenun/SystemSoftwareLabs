@@ -1344,6 +1344,53 @@ info args
 
 与之前的结果进行对比可知QEMU 的软件TLB不完全等同于真实CPU的分页TLB，真实CPU的分页TLB主要缓存虚拟地址到物理地址的转换QEMU还需要把客户机的内存访问落实到宿主机内存，因此，即使客户机当前不进行分页转换，也会使用软件TLB加速访问。
 
+**buddy\_system模块测试**
+
+在终端中输入make qemu后，可在最下方看到buddy\_system模块的测试结果。
+
+![image\.png](images/image%208.png)
+
+使用gdb进行单步调试，
+
+`make debug` 加 `make gdb` 之后按顺序执行 `b kern_init` 和 `c`，会话中应出现：
+
+```Plain Text
+Breakpoint 1 at 0xffffffffc02000d8: file kern/init/init.c, line 31.
+Breakpoint 1, kern_init () at kern/init/init.c:31
+31            memset(edata, 0, end - edata);
+```
+
+也就是说 PC 停在 `0xffffffffc02000d8`（物理地址 `0x802000d8`）。继续执行 `b test_buddy` 和 `c` 之后：
+
+```Plain Text
+Breakpoint 2 at 0xffffffffc020XXXX: file kern/mm/buddy_test.c, line 57.
+Breakpoint 2, test_buddy () at kern/mm/buddy_test.c:57
+```
+
+此时 `p free0` 应在执行到第 64 行之后取值为 `31930`。
+
+结果如图
+
+![image\.png](images/image%206.png)
+
+**SLUB模块测试：**
+
+把 kern/init/init\.c 里这三行取消注释：
+
+```C
+#include <slub.h>
+slub_init();
+slub_self_test();
+```
+
+修改后重新编译，下方出现SLUB测试结果。可以看到slub模块运行正常，与预期结果相符。
+
+![image\.png](images/image%201.png)
+
+启用gdb调试后结果如图。
+
+![image\.png](images/image%202.png)
+
 **调试过程中的细节及收获：**
 
 两个 GDB 的执行状态存在联系。我们在 RISC\-V GDB 中单步执行内核的存储指令后，本机 GDB 命中了 QEMU 中的断点，此时 RISC\-V GDB 会等待。通过这一现象，我们理解了 ucore 的执行依赖 QEMU：当模拟器被暂停时，其中的虚拟 CPU 也无法继续执行。
