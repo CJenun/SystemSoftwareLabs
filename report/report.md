@@ -122,7 +122,7 @@ static inline struct Page *pa2page(uintptr_t pa);
 
 以下是经过迭代优化后，最终成功实现该功能的提示词：
 
-```C++
+````text
 [PROMPT]
 **任务**：修改文件kern/mm/pmm.c，实现page_init()。该函数负责：在链接符号
 end之后建立覆盖全部物理内存的Page描述符数组；把OpenSBI、内核镜像和
@@ -240,7 +240,7 @@ static void page_init(void);
   物理页号（如npage）。
 - 函数名以骨架代码为准：是init_memmap，不是旧版指导书里的
   init_memmapp。
-```
+````
 
 #### 实现迭代过程
 
@@ -357,7 +357,7 @@ Best\-Fit模块负责管理可用物理页面，为内核提供连续物理页�
 
 以下是经过迭代优化后，最终成功实现该功能的提示词：
 
-```Markdown
+````text
 [PROMPT]
 
 任务：
@@ -550,7 +550,7 @@ Best-Fit注册结构已定义，并可通过现有头文件访问。
 
 Post-Condition：
 `pmm_manager` 指向 `best_fit_pmm_manager`，原有管理器名称输出及初始化调用保持有效。后续通过公共页面管理接口进行的分配、释放和检查均使用Best-Fit模块。
-```
+````
 
 #### 实现迭代过程
 
@@ -623,7 +623,7 @@ static void buddy_check(void)；
 
 以下是经过迭代优化后，最终成功实现该功能的提示词：
 
-```Markdown
+````text
 [PROMPT]
 任务：新建 kern/mm/buddy_pmm.c、kern/mm/buddy_pmm.h，并修改 kern/mm/pmm.c，实现 Buddy 物理内存分配模块。Buddy System算法把系统中的可用存储空间划分为存储块(Block)来进行管理, 每个存储块的大小必须是2的n次幂(Pow(2, n)), 即1, 2, 4, 8, 16, 32, 64, 128...。最后在 pmm.c 中用 USE_BUDDY_PMM 宏选择（默认仍用 best_fit）。
 
@@ -712,7 +712,7 @@ buddy_check
 分配 3 页（实际占 4 页），释放后再次恢复；
 申请比全部空闲页还多的内存，必须返回 NULL；
 再检查一遍链表。 只用 assert，结束时状态不变。
-```
+````
 
 #### 实现迭代过程
 
@@ -816,7 +816,7 @@ static void *slub_alloc_large(size_t size);
 
 以下是经过迭代优化后，最终成功实现该功能的提示词：
 
-```Plain Text
+````text
 [PROMPT]
 **任务**：修改文件 `kern/mm/slub.h`、`kern/mm/slub.c`、`kern/mm/slub_test.c`、`kern/init/init.c`，在 uCore lab2（RISC-V、Sv39）中实现一个简化 `slub` 内存分配模块。模块必须采用两层架构：
 
@@ -1032,7 +1032,7 @@ Post-Condition：文件中出现 `// #include <slub.h>`，并在 `pmm_init()` �
 Case 1：保持注释。内核正常启动，不输出 SLUB 自检信息。
 Case 2：取消注释。`slub_init()` 被调用，随后运行 `slub_self_test()`。
 Requirements：不得修改 `kern_init` 的其他逻辑；不得在注释外新增 SLUB 调用；不得修改 `pmm.c` 或评分脚本。
-```
+````
 
 #### 实现迭代过程
 
